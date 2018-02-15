@@ -18,3 +18,23 @@ class DodajObjavoHandler(BaseHandler):
                              uporabnik_email=email)
         nova_objava.put()
         return self.write("Objava dodana.")
+
+
+class PreglejObjaveHandler(BaseHandler):
+    def get(self):
+        objave = Objava.query().fetch()
+        params = {
+            "objave": objave
+        }
+        return self.render_template("preglej_objave.html", params)
+
+
+class PreglejObjavoHandler(BaseHandler):
+    def get(self, objava_id):
+        objava = Objava.get_by_id(int(objava_id))
+        if not objava:
+            return self.write('Te objave ni.')
+        params = {
+            "objava": objava
+        }
+        return self.render_template("preglej_objavo.html", params)

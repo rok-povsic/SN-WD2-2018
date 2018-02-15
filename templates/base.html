@@ -30,12 +30,13 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">About</a></li>
+                <li><a href="/preglej-objave">Preglej objav</a></li>
+                <li><a href="#">O nas</a></li>
 
                 {% if not uporabnik %}
-                    <li><a href="{{ url_prijave }}">Login</a></li>
+                    <li><a href="{{ url_prijave }}">Prijavi si</a></li>
                 {% else %}
-                   <li><a href="{{ url_odjave }}">Logout</a></li>
+                   <li><a href="{{ url_odjave }}">Odjavi se</a></li>
                 {% endif %}
 
               </ul>
