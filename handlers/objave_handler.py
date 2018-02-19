@@ -1,19 +1,14 @@
 import cgi
-import uuid
 
 from google.appengine.api import users, memcache
 
 from handlers.base_handler import BaseHandler
-from models.models import Objava
+from models.models import Objava, Komentar
 
 
 class DodajObjavoHandler(BaseHandler):
     def get(self):
-        params = {
-            "csrf_zeton": str(uuid.uuid4())
-        }
-        memcache.add(params["csrf_zeton"], True, 60 * 10)
-        return self.render_template("dodaj_objavo.html", params)
+        return self.render_template("dodaj_objavo.html")
 
     def post(self):
         vrednost_csrf = self.request.get("csrf-zeton")
@@ -46,7 +41,24 @@ class PreglejObjavoHandler(BaseHandler):
         objava = Objava.get_by_id(int(objava_id))
         if not objava:
             return self.write('Te objave ni.')
+        komentarji = Komentar.query(Komentar.objava_id == str(objava.key.id())).order(-Komentar.cas_objave).fetch()
         params = {
-            "objava": objava
+            "objava": objava,
+            "komentarji": komentarji,
         }
         return self.render_template("preglej_objavo.html", params)
+
+    def post(self, objava_id):
+        vrednost_csrf = self.request.get("csrf-zeton")
+
+        if not memcache.get(vrednost_csrf):
+            return self.write("CSRF napad v dogajanju.")
+
+        vsebina = cgi.escape(self.request.get("text"))
+        uporabnik = users.get_current_user()
+        email = uporabnik.email()
+        nov_komentar = Komentar(vsebina=vsebina,
+                                uporabnik_email=email,
+                                objava_id=objava_id)
+        nov_komentar.put()
+        return self.write("Komentar dodan.")
