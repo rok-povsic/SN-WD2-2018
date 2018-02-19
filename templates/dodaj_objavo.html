@@ -17,6 +17,8 @@
                 <textarea name="text" class="form-control" rows="6" required></textarea>
             </div>
 
+            <input name="csrf-zeton" value="{{ csrf_zeton }}" hidden>
+
             <button type="submit" class="btn btn-success">Submit</button>
         </form>
     </div>

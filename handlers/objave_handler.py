@@ -1,4 +1,7 @@
-from google.appengine.api import users
+import cgi
+import uuid
+
+from google.appengine.api import users, memcache
 
 from handlers.base_handler import BaseHandler
 from models.models import Objava
@@ -6,11 +9,20 @@ from models.models import Objava
 
 class DodajObjavoHandler(BaseHandler):
     def get(self):
-        return self.render_template("dodaj_objavo.html")
+        params = {
+            "csrf_zeton": str(uuid.uuid4())
+        }
+        memcache.add(params["csrf_zeton"], True, 60 * 10)
+        return self.render_template("dodaj_objavo.html", params)
 
     def post(self):
-        naslov = self.request.get("title")
-        vsebina = self.request.get("text")
+        vrednost_csrf = self.request.get("csrf-zeton")
+
+        if not memcache.get(vrednost_csrf):
+            return self.write("CSRF napad v dogajanju.")
+
+        naslov = cgi.escape(self.request.get("title"))
+        vsebina = cgi.escape(self.request.get("text"))
         uporabnik = users.get_current_user()
         email = uporabnik.email()
         nova_objava = Objava(naslov=naslov,
@@ -22,7 +34,7 @@ class DodajObjavoHandler(BaseHandler):
 
 class PreglejObjaveHandler(BaseHandler):
     def get(self):
-        objave = Objava.query().fetch()
+        objave = Objava.query().order(-Objava.cas_objave).fetch()
         params = {
             "objave": objave
         }
