@@ -55,10 +55,10 @@ class PreglejObjavoHandler(BaseHandler):
             return self.write("CSRF napad v dogajanju.")
 
         vsebina = cgi.escape(self.request.get("text"))
-        uporabnik = users.get_current_user()
-        email = uporabnik.email()
-        nov_komentar = Komentar(vsebina=vsebina,
-                                uporabnik_email=email,
-                                objava_id=objava_id)
-        nov_komentar.put()
+        Komentar.shrani_komentar(objava_id, vsebina)
+
+
+
         return self.write("Komentar dodan.")
+
+
