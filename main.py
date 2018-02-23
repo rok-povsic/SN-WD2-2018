@@ -2,6 +2,7 @@
 
 import webapp2
 
+from cron.izbris_cron import IzbrisObjavCron
 from handlers.cookie_handler import CookieHandler
 from handlers.main_handler import MainHandler
 from handlers.objave_handler import DodajObjavoHandler, PreglejObjaveHandler, PreglejObjavoHandler, IzbrisObjaveHandler
@@ -17,4 +18,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/izbris-objave/<objava_id:\d+>', IzbrisObjaveHandler),
     webapp2.Route('/moji-komentarji', MojiKomentarjiHandler),
     webapp2.Route('/task/send-comment-mail', MailWorker),
+    webapp2.Route('/cron/izbris-objav', IzbrisObjavCron)
 ], debug=True)
