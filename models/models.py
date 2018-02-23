@@ -34,3 +34,11 @@ class Komentar(ndb.Model):
                           "email_avtorja_objave": objava.uporabnik_email,
                           "email_avtorja_komentarja": email
                       })
+
+    def naslov_teme(self):
+        """
+        V tej metodi najdemo naslov objave, v kateri se nahaja ta komentar.
+        Pozor: to lahko naredimo le, ker ta metoda ni staticna (staticmethod ali classmethod).
+        Staticna metoda ne more uporabiti `self`.
+        """
+        return Objava.get_by_id(int(self.objava_id)).naslov
