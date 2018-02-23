@@ -15,3 +15,9 @@ indexes:
   - name: objava_id
   - name: cas_objave
     direction: desc
+
+- kind: Objava
+  properties:
+  - name: cas_izbrisa
+  - name: cas_objave
+    direction: desc

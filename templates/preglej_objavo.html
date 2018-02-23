@@ -2,6 +2,10 @@
 
 {% block vsebina %}
 
+    {% if prikazi_izbris %}
+    <a href="/izbris-objave/{{ objava.key.id() }}" class="btn btn-danger">Izbris objave</a>
+    {% endif %}
+
     <div class="jumbotron">
         <h2><a href="/preglej-objavo/{{ objava.key.id() }}">{{ objava.naslov }}</a></h2>
         <p>{{ objava.vsebina }}</p>

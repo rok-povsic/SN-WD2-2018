@@ -1,5 +1,7 @@
 import cgi
 
+from datetime import datetime
+
 from google.appengine.api import users, memcache
 
 from handlers.base_handler import BaseHandler
@@ -29,7 +31,7 @@ class DodajObjavoHandler(BaseHandler):
 
 class PreglejObjaveHandler(BaseHandler):
     def get(self):
-        objave = Objava.query().order(-Objava.cas_objave).fetch()
+        objave = Objava.query(Objava.cas_izbrisa == None).order(-Objava.cas_objave).fetch()
         params = {
             "objave": objave
         }
@@ -41,10 +43,18 @@ class PreglejObjavoHandler(BaseHandler):
         objava = Objava.get_by_id(int(objava_id))
         if not objava:
             return self.write('Te objave ni.')
+
+        if objava.cas_izbrisa != None:
+            return self.write('Ta objava je bila izbrisana.')
+
         komentarji = Komentar.query(Komentar.objava_id == str(objava.key.id())).order(-Komentar.cas_objave).fetch()
+
+        prikazi_izbris = users.get_current_user().email() == objava.uporabnik_email or users.is_current_user_admin()
+
         params = {
             "objava": objava,
             "komentarji": komentarji,
+            "prikazi_izbris": prikazi_izbris
         }
         return self.render_template("preglej_objavo.html", params)
 
@@ -57,8 +67,19 @@ class PreglejObjavoHandler(BaseHandler):
         vsebina = cgi.escape(self.request.get("text"))
         Komentar.shrani_komentar(objava_id, vsebina)
 
-
-
         return self.write("Komentar dodan.")
 
+
+class IzbrisObjaveHandler(BaseHandler):
+    def get(self, objava_id):
+        objava = Objava.get_by_id(int(objava_id))
+        if not objava:
+            return self.write('Te objave ni.')
+
+        if not (users.get_current_user().email() == objava.uporabnik_email or users.is_current_user_admin()):
+            return self.write("Objavo lahko izbrise le njen avtor ali administrator.")
+
+        objava.cas_izbrisa = datetime.now()
+        objava.put()
+        return self.write("Objava je bila izbrisana.")
 
