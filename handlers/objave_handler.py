@@ -83,3 +83,8 @@ class IzbrisObjaveHandler(BaseHandler):
         objava.put()
         return self.write("Objava je bila izbrisana.")
 
+
+import random
+class StKomentarjevHandler(BaseHandler):
+    def get(self, objava_id):
+        return self.write(random.randint(0, 999))
